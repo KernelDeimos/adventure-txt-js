@@ -77,16 +77,41 @@ let items = [
 
 items.sort(() => Math.random());
 
-lib.subjective = num =>
-    num < 10 ? ['hardly', 'not too', 'less than half'] :
-    num < 25 ? ['a tiny bit', 'not too', 'less than half', 'any'] :
-    num < 30 ? ['a little', 'not too', 'less than half', 'any'] :
-    num < 50 ? ['somewhat', 'less than half', 'any'] :
-    num < 60 ? ['half', 'more than half', 'any'] :
-    num < 70 ? ['decently', 'quite', 'more than half', 'any'] :
-    num < 80 ? ['considerably', 'decently', 'more than half', 'quite', 'very', 'any'] :
-    num < 90 ? ['extremely', 'considerably', 'decently', 'more than half', 'quite', 'very', 'any'] :
-    ['ultimately', 'more than half', 'quite', 'very', 'any'];
+lib.subjective = n => {
+    let specific = [
+        [0, 10, 'hardly'],
+        [10, 25, 'a tiny bit'],
+        [25, 30, 'a little'],
+        [30, 45, 'somewhat'],
+        [45, 55, 'half'],
+        [55, 70, 'decently'],
+        [70, 80, 'considerably'],
+        [80, 90, 'extremely'],
+        [90, 100, 'ultimately'],
+    ];
+
+    let descriptive = [
+        [0, 40, 'not too'],
+        [40, 70, 'medium'],
+        [70, 100, 'quite'],
+        [80, 100, 'very'],
+    ];
+    
+    let range = [
+        [0, 50, 'less than half'],
+        [50, 100, 'at least half'],
+        [10, 100, 'any'],
+    ];
+    
+    let lists = [specific, descriptive, range];
+    
+    let adverbs = [];
+    for ( let list of lists ) for ( let row of list ) {
+        if ( n >= row[0] && n < row[1] ) adverbs.push(row[2]);
+    }
+
+    return adverbs;
+};
 
 lib.adverb = num => lib.subjective(num)[0];
 
