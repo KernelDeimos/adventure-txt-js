@@ -6,8 +6,8 @@ Text adventure engine developed entirely just for fun.
 
 Contributions must adhere to these rules
 
-- Plan a little bit
 - Do something fun
 - Don't panic
 
-The `experiments` folder is there to try anything you want. Experiments don't have to tie into any existing architecture - we'll figure out how to wire it up later.
+The `experiments` folder is there to try anything you want. Experiments don't have to tie into any existing architecture - we'll figure out how to wire it up later. Any PR adding something
+to `experiments` will be approved unless it's overtly off-topic or malicious.
