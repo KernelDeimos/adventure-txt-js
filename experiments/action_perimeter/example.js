@@ -17,6 +17,9 @@ let itemModel = {
 }
 
 let lib = {};
+lib.randBetween = (min, max) => {
+    return min + Math.floor(Math.random() * ((max - min) + 1));
+}
 lib.randomObject = name => {
     let o = {};
     for ( let prop of itemModel.properties ) {
@@ -26,9 +29,11 @@ lib.randomObject = name => {
             case 'choice':
                 let i = Math.floor(Math.random() * prop.options.length);
                 o[prop.name] = prop.options[i];
+                continue;
             case 'number':
-                let n = Math.floor(Math.random() * prop.max) + 1
+                let n = Math.floor(Math.random() * (prop.max + 1))
                 o[prop.name] = n;
+                continue;
         }
     }
     o.name = name;
@@ -36,21 +41,23 @@ lib.randomObject = name => {
 };
 lib.foodObject = name => {
     let o = lib.randomObject(name);
-    o.nutrition = Math.min(o.nutrition + 50, 100);
-    o.sharpness = Math.max(o.sharpness - 30, 0);
+    o.nutrition = lib.randBetween(60, 100);
+    o.sharpness = Math.max(o.sharpness - 60, 0);
+    o.hardness = Math.max(o.hardness - 60, 0);
     return o;
 }
 lib.metalObject = name => {
     let o = lib.randomObject(name);
     o.nutrition = Math.max(o.nutrition - 60, 0);
-    o.sharpness = Math.min(o.sharpness + 40, 0);
-    o.hardness = Math.min(o.hardness + 40, 0);
-    o.weight = Math.min(o.weight + 40, 0);
+    o.sharpness = Math.min(o.sharpness + 30, 100);
+    o.hardness = Math.min(o.hardness + 40, 100);
+    o.weight = Math.min(o.weight + 40, 100);
     return o;
 }
 lib.weaponObject = name => {
     let o = lib.metalObject(name);
-    o.magicness = Math.min(o.magicness + 30, 0);
+    o.magicness = Math.min(o.magicness + 30, 100);
+    o.sharpness = Math.min(o.sharpness + 30, 100);
     o.aerodynamicness = Math.min(o.aerodynamicness + 20, 0);
     return o;
 }
@@ -76,10 +83,12 @@ lib.subjective = num =>
     num < 30 ? ['a little', 'not too', 'less than half', 'any'] :
     num < 50 ? ['somewhat', 'less than half', 'any'] :
     num < 60 ? ['half', 'more than half', 'any'] :
-    num < 70 ? ['decently', 'more than half', 'any'] :
-    num < 80 ? ['considerably', 'more than half', 'very', 'any'] :
-    num < 90 ? ['extremely', 'more than half', 'very', 'any'] :
-    ['ultimately', 'more than half', 'very', 'any'];
+    num < 70 ? ['decently', 'quite', 'more than half', 'any'] :
+    num < 80 ? ['considerably', 'decently', 'more than half', 'quite', 'very', 'any'] :
+    num < 90 ? ['extremely', 'considerably', 'decently', 'more than half', 'quite', 'very', 'any'] :
+    ['ultimately', 'more than half', 'quite', 'very', 'any'];
+
+lib.adverb = num => lib.subjective(num)[0];
 
 lib.is = (o, qual, prop) => {
     return lib.subjective(o[prop]).includes(qual);
@@ -101,10 +110,13 @@ let funcs = {
             msg += `It's${a ? ' also' : ''} sharp! You lose ${-1*healthDelta} hp! `
             b = true;
         }
-        if ( lib.is(o, 'very', 'nutrition') ) {
-            msg += `${a || b ? "At least it's" : "It's"} very nutritious!`;
+        if ( lib.is(o, 'quite', 'nutrition') ) {
+            let adverb = lib.adverb(o.nutrition);
+            msg += `${a || b ? (
+                adverb == "ultimately" ? "Surprisingly, it's" : "At least it's"
+            ) : "It's"} ${adverb} nutritious!`;
         }
-        if ( lib.is(o, 'not too', 'nutrition') ) {
+        if ( lib.is(o, 'not too', 'nutrition') && ! b ) {
             msg += `It's not very nutritious; should you be eating this?`;
         }
         return msg;
